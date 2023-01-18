@@ -14,7 +14,39 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
+
+type (
+	Config struct {
+		Generators []struct {
+			Input Input
+		}
+	}
+
+	Input struct {
+		Type string
+	}
+)
+
+func TestNotNukesStructs(t *testing.T) {
+	config := Config{
+		Generators: []struct {
+			Input Input
+		}{
+			{
+				Input: Input{
+					Type: "foo",
+				},
+			},
+		},
+	}
+
+	require.NoError(t, Process("WORKER", &config))
+	require.Len(t, config.Generators, 1)
+	require.Equal(t, "foo", config.Generators[0].Input.Type)
+}
 
 type HonorDecodeInStruct struct {
 	Value string
