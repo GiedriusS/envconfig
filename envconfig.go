@@ -184,11 +184,12 @@ func gatherInfo(prefix string, spec interface{}, env map[string]string, isInside
 				}
 			}
 
-			if l == 0 {
-				// Just leave it alone, nothing came from env variables.
-				continue
+			if l != 0 {
+				f.Set(reflect.MakeSlice(f.Type(), l, l))
+			} else {
+				l = f.Len()
 			}
-			f.Set(reflect.MakeSlice(f.Type(), l, l))
+
 			for i := 0; i < l; i++ {
 				var structPtrValue reflect.Value
 

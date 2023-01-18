@@ -26,9 +26,35 @@ type (
 	}
 
 	Input struct {
-		Type string
+		Type string `envconfig:"TEST"`
 	}
 )
+
+func TestStilLoadsSecrets(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("WORKER_GENERATORS_0_INPUT_TEST", "test")
+
+	config := Config{
+		Generators: []struct {
+			Input Input
+		}{
+			{
+				Input: Input{
+					Type: "foo",
+				},
+			},
+			{
+				Input: Input{
+					Type: "haha",
+				},
+			},
+		},
+	}
+
+	require.NoError(t, Process("WORKER", &config))
+	require.Len(t, config.Generators, 1)
+	require.Equal(t, "test", config.Generators[0].Input.Type)
+}
 
 func TestNotNukesStructs(t *testing.T) {
 	config := Config{
